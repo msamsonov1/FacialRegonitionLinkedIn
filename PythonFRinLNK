@@ -1,0 +1,31 @@
+import cv2
+import sys
+import os
+import urllib.request
+
+# Define the Haar cascade classifier for face detection
+faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+# Create a directory to store the registered faces
+registeredFacesDir = os.path.join('registered_faces')
+if not os.path.exists(registeredFacesDir):
+    os.mkdir(registeredFacesDir)
+
+# Get the LinkedIn profile photo URL of the person you want to register
+linkedinProfilePhotoUrl = 'https://www.linkedin.com/in/<person_name>/photo'
+
+# Download the LinkedIn profile photo
+urllib.request.urlretrieve(linkedinProfilePhotoUrl, filename='registered_face.jpg')
+
+# Read the LinkedIn profile photo
+img = cv2.imread('registered_face.jpg')
+
+# Detect faces in the LinkedIn profile photo
+faces = faceCascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+# If faces are found, save the face to the registered faces directory
+if len(faces) > 0:
+    for (x, y, w, h) in faces:
+        faceROI = img[y:y + h, x:x + w]
+        cv2.imwrite(os.path.join(registeredFacesDir, 'registered_face.jpg'), faceROI)
+
